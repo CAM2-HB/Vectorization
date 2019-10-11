@@ -1,6 +1,7 @@
 import os
 import sys
 import csv
+import shutil
 
 import cv2
 
@@ -32,7 +33,7 @@ def compareSingle(outputPath, dataPath):
 	return
 
 
-def compareFolder(outputPath, dataPath):
+def compareFolder(outputPath, dataPath, finalPath):
 	#run openface vectorization on each image in datapath and send output to outputpath
 	for angle in os.listdir(dataPath):
 		os.system("../OpenFace/OpenFace/build/bin/FaceLandmarkImg -fdir " + dataPath + angle + " -out_dir " + outputPath + angle)
@@ -40,9 +41,8 @@ def compareFolder(outputPath, dataPath):
 		name = image.split('.')
 		if len(name) > 1 and name[1] == 'jpg':
 			maxconfidence = 0
-			maxname = 'Error'
 			for folder in os.listdir(outputPath):
-				if outputPath + folder + "/" + name[0] + ".csv" in os.listdir(outputPath + folder):
+				if name[0] + ".csv" in os.listdir(outputPath + folder):
 					with open(outputPath + folder + "/" + name[0] + ".csv", 'r') as f:
 						data = list(csv.reader(f))
 					#confidence in second column, second row of csv
@@ -50,7 +50,7 @@ def compareFolder(outputPath, dataPath):
 					if confidence > maxconfidence:
 						maxconfidence = confidence
 						maxname = folder
-			sys.stdout.write(maxname + " ")
+			shutil.copy(outputPath + maxname + '/' + name[0] + '.jpg', finalPath)
 	
 
 
@@ -59,6 +59,7 @@ if __name__ == "__main__":
 	dataPath = "../SampleData/SingleTestIMGs/"
 	#specify directory that output will be sent to
 	outputPath = "../Output/"
+	finalPath = '../Final/Ethan/'
 	
 	#compareSingle(outputPath, dataPath)
-	compareFolder(outputPath, dataPath)
+	compareFolder(outputPath, dataPath, finalPath)
