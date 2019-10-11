@@ -13,7 +13,7 @@ def compareSingle(outputPath, dataPath):
 		name = item.split('.')
 		#identify all csvs and find the highest confidence
 		if len(name) > 1 and name[1] == 'csv':
-			with open(outputPath + thing, 'r') as f:
+			with open(outputPath + item, 'r') as f:
 				data = list(csv.reader(f))
 			#confidence in second column, second row of csv
 			confidence = float(data[1][1])
@@ -36,16 +36,29 @@ def compareFolder(outputPath, dataPath):
 	#run openface vectorization on each image in datapath and send output to outputpath
 	for angle in os.listdir(dataPath):
 		os.system("../OpenFace/OpenFace/build/bin/FaceLandmarkImg -fdir " + dataPath + angle + " -out_dir " + outputPath + angle)
-	#for image in os.listdir(outputPath + angle):
-	#	for 
+	for image in os.listdir(outputPath + angle):
+		name = image.split('.')
+		if len(name) > 1 and name[1] == 'jpg':
+			maxconfidence = 0
+			maxname = 'Error'
+			for folder in os.listdir(outputPath):
+				if outputPath + folder + "/" + name[0] + ".csv" in os.listdir(outputPath + folder):
+					with open(outputPath + folder + "/" + name[0] + ".csv", 'r') as f:
+						data = list(csv.reader(f))
+					#confidence in second column, second row of csv
+					confidence = float(data[1][1])
+					if confidence > maxconfidence:
+						maxconfidence = confidence
+						maxname = folder
+			sys.stdout.write(maxname + " ")
 	
 
 
 if __name__ == "__main__":
 	#specify directory that input data is located
-	dataPath = "../SampleData/SingleTestIMGs/00/"
+	dataPath = "../SampleData/SingleTestIMGs/"
 	#specify directory that output will be sent to
 	outputPath = "../Output/"
 	
-	compareSingle(outputPath, dataPath)
-	#compareFolder(outputPath, dataPath)
+	#compareSingle(outputPath, dataPath)
+	compareFolder(outputPath, dataPath)
