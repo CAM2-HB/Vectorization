@@ -54,13 +54,14 @@ def compareFolder(outputPath, dataPath, finalPath):
                                     if confidence > maxconfidence:
                                             maxconfidence = confidence
                                             maxname = folder
-                    img = cv2.imread(outputPath + name[0] + '.jpg')
-                    cv2.putText(img, str(maxconfidence), (0, 100), cv2.FONT_HERSHEY_SIMPLEX, 2.0, color=(0, 255, 255))
-                    cv2.putText(img, str(maxname), (100, 100), cv2.FONT_HERSHEY_SIMPLEX, 2.0, color=(0, 255, 255))
-                    cv2.imshow('image',img)
-                    cv2.imwrite('img.jpg',img)
-                    cv2.waitKey(1000)
-                    shutil.copy(outputPath + maxname + '/' + name[0] + '.jpg', finalPath)
+                    # Printing confidence followed by camera id                        
+                    img = cv2.imread(outputPath + maxname + "/" + name[0] + '.jpg')
+                    cv2.putText(img, str(maxconfidence) + " " + str(maxname), (0, 625), cv2.FONT_HERSHEY_SIMPLEX, 1.5, color=(255, 0, 0))
+                    #cv2.putText(img, str(maxname), (100, 100), cv2.FONT_HERSHEY_SIMPLEX, 2.0, color=(0, 255, 255))
+                   # cv2.imshow('image',img)
+                    cv2.imwrite(name[0] + '.jpg',img)
+                    #cv2.waitKey(1000)
+                    shutil.copy(name[0] + '.jpg', finalPath)
 
 
 
