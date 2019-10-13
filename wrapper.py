@@ -11,7 +11,7 @@ def compareSingle(outputPath, dataPath):
         os.system("../OpenFace/OpenFace/build/bin/FaceLandmarkImg -fdir " + dataPath + " -out_dir " + outputPath)
         maxconfidence = 0
         for item in os.listdir(outputPath):
-            name = item.split('.')
+                name = item.split('.')
                 #identify all csvs and find the highest confidence
                 if len(name) > 1 and name[1] == 'csv':
                     with open(outputPath + item, 'r') as f:
@@ -20,7 +20,7 @@ def compareSingle(outputPath, dataPath):
                         confidence = float(data[1][1])
                         if confidence > maxconfidence:
                             maxconfidence = confidence
-                                maxname = name[0]
+                            maxname = name[0]
 
 
 
