@@ -47,40 +47,42 @@ def compareFolder(outputPath, dataPath, finalPath):
 			maxconfidence = 0
 			#compare jpgs across folders at each timeframe (img0000 in folder 1, 2, 3)
 			for folder in os.listdir(outputPath):
-                #check whether it's a folder or not
-                if os.path.isdir(outputPath + folder):
-                    if name[0] + ".csv" in os.listdir(outputPath + folder):
-                        with open(outputPath + folder + "/" + name[0] + ".csv", 'r') as f:
-                            data = list(csv.reader(f))
-                        #confidence in second column, second row of csv
-                        confidence = float(data[1][1])
-                        if confidence > maxconfidence:
-                            maxconfidence = confidence
-                            maxname = folder
+				#check whether it's a folder or not
+				if os.path.isdir(outputPath + folder):
+				   	if name[0] + ".csv" in os.listdir(outputPath + folder):
+						with open(outputPath + folder + "/" + name[0] + ".csv", 'r') as f:
+					    		data = list(csv.reader(f))
+						#confidence in second column, second row of csv
+						confidence = float(data[1][1])
+						if confidence > maxconfidence:
+					    		maxconfidence = confidence
+							maxname = folder
+							
 			#identifies image with highest confidence at each timeframe and adds it to finalPath, adds image ID, folder, confidence to final text file
 			#shutil.copy(outputPath + maxname + '/' + name[0] + '.jpg', finalPath)
 			imagedata = [name[0], maxname, maxconfidence]
-            final.append(imagedata)
-   
-           #print confidence onto the final images
-           img = cv2.imread(outputPath + maxname + '/' + name[0] + '.jpg')
-           cv2.putText(img, str(maxconfidence), (100, 300), cv2.FONT_HERSHEY_SIMPLEX, 2.0, color=(0, 255, 255))
-           #saves image
-           write_name = finalPath + '/' + name[0] + '.jpg'
-           cv2.imwrite(write_name, img)
-           cv2.waitKey(1000)
-           
+			final.append(imagedata)
+
+			#print confidence onto the final images
+			img = cv2.imread(outputPath + maxname + '/' + name[0] + '.jpg')
+			cv2.putText(img, str(maxconfidence), (100, 300), cv2.FONT_HERSHEY_SIMPLEX, 2.0, color=(0, 255, 255))
+			#saves image
+			write_name = finalPath + '/' + name[0] + '.jpg'
+			cv2.imwrite(write_name, img)
+			cv2.waitKey(1000)
+
 	with open(finalPath + 'final.txt', 'w') as f:
 		f.write("image, camera, confidence\n")
 		for data in final:
 			f.write(data[0] + ", " + data[1] + ", " + str(data[2]) + '\n')
-    #sort and print the finaldata
-    a = []
-    with open(finalPath + 'final.txt', 'r') as f:
-        for line in f:
-            a.append(line.strip())
-        for item in sorted(a):
-            print(item)
+			
+	#sort and print the finaldata
+	a = []
+	with open(finalPath + 'final.txt', 'r') as f:
+		for line in f:
+		    a.append(line.strip())
+		for item in sorted(a):
+		    print(item)
 	return
 	
 
