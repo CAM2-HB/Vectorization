@@ -65,7 +65,7 @@ def compareFolder(outputPath, dataPath, finalPath):
 
 			#print confidence onto the final images
 			img = cv2.imread(outputPath + maxname + '/' + name[0] + '.jpg')
-			cv2.putText(img, str(maxconfidence), (100, 300), cv2.FONT_HERSHEY_SIMPLEX, 2.0, color=(0, 255, 255))
+			cv2.putText(img, str(maxconfidence), (100, 300), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 255), 2)
 			#saves image
 			write_name = finalPath + '/' + name[0] + '.jpg'
 			cv2.imwrite(write_name, img)
