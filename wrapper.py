@@ -1,6 +1,7 @@
 import os
 import sys
 import csv
+import math
 import shutil
 from itertools import islice
 import cv2
@@ -8,7 +9,7 @@ import cv2
 
 def compareSingle(outputPath, dataPath):
     #run openface vectorization on each image in datapath and send output to outputpath
-    os.system("../build/bin/FaceLandmarkImg -fdir " + dataPath + " -out_dir " + outputPath)
+    os.system("..OpenFace/OpenFace/build/bin/FaceLandmarkImg -fdir " + dataPath + " -out_dir " + outputPath)
     maxconfidence = 0
     for item in os.listdir(outputPath):
         name = item.split('.')
@@ -37,7 +38,7 @@ def compareFolder(outputPath, dataPath, finalPath):
     #run openface vectorization on each image in datapath and send output to outputpath
     final = []
     for angle in os.listdir(dataPath):
-        os.system("../build/bin/FaceLandmarkImg -fdir " + dataPath + angle + " -out_dir " + outputPath + angle)
+        os.system("../OpenFace/OpenFace/build/bin/FaceLandmarkImg -fdir " + dataPath + angle + " -out_dir " + outputPath + angle)
     #for each timeframe
     for image in os.listdir(outputPath + angle):
         imagedata = []
@@ -56,12 +57,16 @@ def compareFolder(outputPath, dataPath, finalPath):
                         confidence = float(data[1][1])
                         if confidence > maxconfidence:
                             maxconfidence = confidence
+                            for index, d in enumerate(data[0]):
+				#search top row of CSV for pose_Ry, which is the angle we are analyzing for starters
+                                if d == ' pose_Ry':
+                                    maxangle = math.degrees(float(data[1][index]))
                             maxname = folder
 
             
             #identifies image with highest confidence at each timeframe and adds it to finalPath, adds image ID, folder, confidence to final text file
 #            shutil.copy(outputPath + maxname + '/' + name[0] + '.jpg', finalPath)
-            imagedata = [name[0][-4:], maxname, maxconfidence]
+            imagedata = [name[0][-4:], maxname, maxconfidence, maxangle]
             final.append(imagedata)
             
             #print confidence onto the final images
@@ -74,9 +79,9 @@ def compareFolder(outputPath, dataPath, finalPath):
             
             
     with open(finalPath + 'final.txt', 'w') as f:
-        f.write("image, camera, confidence\n")
+        f.write("image, camera, confidence, angle\n")
         for data in final:
-            f.write(data[0] + ", " + data[1] + ", " + str(data[2]) + '\n')
+            f.write(data[0] + ", " + data[1] + ", " + str(data[2]) + ", " + str(data[3]) + '\n')
     #sort and print the finaldata
     a = []
     print("image, camera, confidence")
@@ -96,7 +101,7 @@ if __name__ == "__main__":
     os.mkdir('../Final/Ethan/')
     
     #specify directory that input data is located
-    dataPath = "../mydata/"
+    dataPath = "../SampleData/SingleTestIMGs/"
     #specify directory that output will be sent to
     outputPath = "../Output/"
     finalPath = '../Final/Ethan/'
