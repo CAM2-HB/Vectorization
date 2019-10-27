@@ -60,7 +60,7 @@ def compareFolder(outputPath, dataPath, finalPath):
                             for index, d in enumerate(data[0]):
 				#search top row of CSV for pose_Ry, which is the angle we are analyzing for starters
                                 if d == ' pose_Ry':
-                                    maxangle = math.degrees(float(data[1][index]))
+                                    maxangle = round(math.degrees(float(data[1][index])), 4)
                             maxname = folder
 
             
@@ -71,11 +71,11 @@ def compareFolder(outputPath, dataPath, finalPath):
             
             #print confidence onto the final images
             img = cv2.imread(outputPath + maxname + '/' + name[0] + '.jpg')
-            cv2.putText(img, str(imagedata), (50, 300), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 255), 2)
+            
+            cv2.putText(img, str(imagedata), (0, len(img) - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 1)
             #saves image
             write_name = finalPath + '/' + name[0] + '.jpg'
             cv2.imwrite(write_name, img)
-            cv2.waitKey(1000)
             
             
     with open(finalPath + 'final.txt', 'w') as f:
@@ -90,6 +90,7 @@ def compareFolder(outputPath, dataPath, finalPath):
             a.append(line.strip())
         for item in sorted(a):
             print(item)
+    print("View final output images and data in " + str(finalPath))
     return
     
 
