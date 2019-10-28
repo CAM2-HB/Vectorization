@@ -60,7 +60,13 @@ def compareFolder(outputPath, dataPath, finalPath):
                             for index, d in enumerate(data[0]):
 				#search top row of CSV for pose_Ry, which is the angle we are analyzing for starters
                                 if d == ' pose_Ry':
-                                    maxangle = round(math.degrees(float(data[1][index])), 4)
+                                    if folder == '00':
+                                        maxangle = round(math.degrees(float(data[1][index])), 4) + 0
+                                    elif folder == '01':
+                                        maxangle = round(math.degrees(float(data[1][index])), 4) + 150
+                                    else folder == '02':
+                                        maxangle = round(math.degrees(float(data[1][index])), 4) + 225
+                                    #maxangle = round(math.degrees(float(data[1][index])), 4)
                             maxname = folder
 
             
