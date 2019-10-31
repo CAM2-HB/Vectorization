@@ -46,6 +46,9 @@ def compareFolder(outputPath, dataPath, finalPath):
         #find jpgs
         if len(name) > 1 and name[1] == 'jpg':
             maxconfidence = 0
+            camzero = 0
+            camone = 150
+            camtwo = 225 #nice
             #compare jpgs across folders at each timeframe (img0000 in folder 1, 2, 3)
             for folder in os.listdir(outputPath):
                 #check whether it's a folder or not
@@ -61,11 +64,11 @@ def compareFolder(outputPath, dataPath, finalPath):
 				#search top row of CSV for pose_Ry, which is the angle we are analyzing for starters
                                 if d == ' pose_Ry':
                                     if folder == '00':
-                                        maxangle = round(math.degrees(float(data[1][index])), 4) + 0
+                                        maxangle = round(math.degrees(float(data[1][index])), 4) + camzero
                                     elif folder == '01':
-                                        maxangle = round(math.degrees(float(data[1][index])), 4) + 150
+                                        maxangle = round(math.degrees(float(data[1][index])), 4) + camone
                                     else folder == '02':
-                                        maxangle = round(math.degrees(float(data[1][index])), 4) + 225
+                                        maxangle = round(math.degrees(float(data[1][index])), 4) + camtwo
                                     #maxangle = round(math.degrees(float(data[1][index])), 4)
                             maxname = folder
 
