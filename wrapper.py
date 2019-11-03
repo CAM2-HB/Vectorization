@@ -67,9 +67,11 @@ def compareFolder(outputPath, dataPath, finalPath):
                                         maxangle = round(math.degrees(float(data[1][index])), 4) + camzero
                                     elif folder == '01':
                                         maxangle = round(math.degrees(float(data[1][index])), 4) + camone
-                                    else folder == '02':
+                                    else :
                                         maxangle = round(math.degrees(float(data[1][index])), 4) + camtwo
                                     #maxangle = round(math.degrees(float(data[1][index])), 4)
+			    if maxangle < 0:
+                            	maxangle += 360
                             maxname = folder
 
             
