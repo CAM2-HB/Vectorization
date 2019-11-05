@@ -75,9 +75,15 @@ def compareFolder(outputPath, dataPath, finalPath):
                             maxname = folder
 
             
-            #identifies image with highest confidence at each timeframe and adds it to finalPath, adds image ID, folder, confidence to final text file
-#            shutil.copy(outputPath + maxname + '/' + name[0] + '.jpg', finalPath)
-            imagedata = [name[0][-4:], maxname, maxconfidence, maxangle]
+        #identifies image with highest confidence at each timeframe and adds it to finalPath, adds image ID, folder, confidence to final text file
+#       shutil.copy(outputPath + maxname + '/' + name[0] + '.jpg', finalPath)
+	confangle = maxangle
+        if maxconfidence < 0.7:
+        	confangle = 0
+        for i in confangle
+        	if i == 0:
+                    
+	imagedata = [name[0][-4:], maxname, maxconfidence, maxangle, confangle]    
             final.append(imagedata)
             
             #print confidence onto the final images
@@ -90,17 +96,17 @@ def compareFolder(outputPath, dataPath, finalPath):
             
             
     with open(finalPath + 'final.txt', 'w') as f:
-        f.write("image, camera, confidence, angle\n")
         for data in final:
-            f.write(data[0] + ", " + data[1] + ", " + str(data[2]) + ", " + str(data[3]) + '\n')
-    #sort and print the finaldata
+            f.write(data[0] + ", " + data[1] + ", " + str(data[2]) + ", " + str(data[3]) + ", " + str(data[4])+'\n')
+#    sort and print the finaldata
     a = []
-    print("image, camera, confidence")
-    with open(finalPath + 'final.txt', 'r') as f:
-        for line in islice(f, 1, None): #skip the title line
+    with open(finalPath + 'final.txt', 'r+') as f:
+        for line in islice(f, 0, None): #skip the title line
             a.append(line.strip())
+        f.seek(0)
+        f.write("image, camera, confidence, angle, confangle\n")
         for item in sorted(a):
-            print(item)
+            f.write(item+'\n')
     print("View final output images and data in " + str(finalPath))
     return
     
