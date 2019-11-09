@@ -70,21 +70,20 @@ def compareFolder(outputPath, dataPath, finalPath):
                                     else :
                                         maxangle = round(math.degrees(float(data[1][index])), 4) + camtwo
                                     #maxangle = round(math.degrees(float(data[1][index])), 4)
-			    if maxangle < 0:
+			    			if maxangle < 0:
                             	maxangle += 360
                             maxname = folder
 
             
-        #identifies image with highest confidence at each timeframe and adds it to finalPath, adds image ID, folder, confidence to final text file
+#       identifies image with highest confidence at each timeframe and adds it to finalPath, adds image ID, folder, confidence to final text file
 #       shutil.copy(outputPath + maxname + '/' + name[0] + '.jpg', finalPath)
-	confangle = maxangle
-        if maxconfidence < 0.7:
-        	confangle = 0
-        for i in confangle
-        	if i == 0:
+			confangle = maxangle
+        	if maxconfidence < 0.7:
+        		confangle = False
                     
-	imagedata = [name[0][-4:], maxname, maxconfidence, maxangle, confangle]    
-            final.append(imagedata)
+			imagedata = [name[0][-4:], maxname, maxconfidence, maxangle, confangle]    
+			final.append(imagedata)
+			final = sorted(final)
             
             #print confidence onto the final images
             img = cv2.imread(outputPath + maxname + '/' + name[0] + '.jpg')
@@ -98,15 +97,7 @@ def compareFolder(outputPath, dataPath, finalPath):
     with open(finalPath + 'final.txt', 'w') as f:
         for data in final:
             f.write(data[0] + ", " + data[1] + ", " + str(data[2]) + ", " + str(data[3]) + ", " + str(data[4])+'\n')
-#    sort and print the finaldata
-    a = []
-    with open(finalPath + 'final.txt', 'r+') as f:
-        for line in islice(f, 0, None): #skip the title line
-            a.append(line.strip())
-        f.seek(0)
-        f.write("image, camera, confidence, angle, confangle\n")
-        for item in sorted(a):
-            f.write(item+'\n')
+#   sort and print the finaldata
     print("View final output images and data in " + str(finalPath))
     return
     
