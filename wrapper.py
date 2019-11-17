@@ -34,70 +34,61 @@ def compareSingle(outputPath, dataPath):
     return
 
 
-def compareFolder(outputPath, dataPath, finalPath):
+def compareFolder(outputPath, dataPath, finalPath, angleDict):
     #run openface vectorization on each image in datapath and send output to outputpath
     final = []
+    imgs = set()
+    print("Running OpenFace\n")
     for angle in os.listdir(dataPath):
         os.system("../OpenFace/OpenFace/build/bin/FaceLandmarkImg -fdir " + dataPath + angle + " -out_dir " + outputPath + angle)
-    #for each timeframe
-    for image in os.listdir(outputPath + angle):
+        for a in os.listdir(dataPath + angle):
+            imgs.add(a)
+    print("Head Pose estimation complete\nAnalyzing output")
+    for image in imgs:
         imagedata = []
         name = image.split('.')
-        #find jpgs
-        if len(name) > 1 and name[1] == 'jpg':
-            maxconfidence = 0
-            camzero = 0
-            camone = 150
-            camtwo = 225 #nice
-            #compare jpgs across folders at each timeframe (img0000 in folder 1, 2, 3)
-            for folder in os.listdir(outputPath):
-                #check whether it's a folder or not
-                if os.path.isdir(outputPath + folder):
-                    if name[0] + ".csv" in os.listdir(outputPath + folder):
-                        with open(outputPath + folder + "/" + name[0] + ".csv", 'r') as f:
-                            data = list(csv.reader(f))
-                        #confidence in second column, second row of csv
-                        confidence = float(data[1][1])
-                        if confidence > maxconfidence:
-                            maxconfidence = confidence
-                            for index, d in enumerate(data[0]):
-				#search top row of CSV for pose_Ry, which is the angle we are analyzing for starters
-                                if d == ' pose_Ry':
-                                    if folder == '00':
-                                        maxangle = round(math.degrees(float(data[1][index])), 4) + camzero
-                                    elif folder == '01':
-                                        maxangle = round(math.degrees(float(data[1][index])), 4) + camone
-                                    else :
-                                        maxangle = round(math.degrees(float(data[1][index])), 4) + camtwo
-                                    #maxangle = round(math.degrees(float(data[1][index])), 4)
-			    			if maxangle < 0:
-                            	maxangle += 360
-                            maxname = folder
+        maxconfidence = 0
+        #compare jpgs across folders at each timeframe (img0000 in folder 1, 2, 3)
+        for folder in os.listdir(outputPath):
+            #check whether it's a folder or not
+            if os.path.isdir(outputPath + folder):
+                if name[0] + ".csv" in os.listdir(outputPath + folder):
+                    with open(outputPath + folder + "/" + name[0] + ".csv", 'r') as f:
+                        data = list(csv.reader(f))
+                    #confidence in second column, second row of csv
+                    confidence = float(data[1][1])
+                    if confidence > maxconfidence:
+                        maxconfidence = confidence
+                        for index, d in enumerate(data[0]):
+                        #search top row of CSV for pose_Ry, which is the angle we are analyzing for starters
+                            if d == ' pose_Ry':
+                                maxangle = (round(math.degrees(float(data[1][index])) + angleDict[folder], 4)) % 360
 
             
-#       identifies image with highest confidence at each timeframe and adds it to finalPath, adds image ID, folder, confidence to final text file
-#       shutil.copy(outputPath + maxname + '/' + name[0] + '.jpg', finalPath)
-			confangle = maxangle
-        	if maxconfidence < 0.7:
-        		confangle = False
-                    
-			imagedata = [name[0][-4:], maxname, maxconfidence, maxangle, confangle]    
-			final.append(imagedata)
-			final = sorted(final)
+            #identifies image with highest confidence at each timeframe and adds it to finalPath, adds image ID, folder, confidence to final text file
+#            shutil.copy(outputPath + maxname + '/' + name[0] + '.jpg', finalPath)
+        imagedata = [name[0][-4:], maxname, maxconfidence, maxangle]
+        final.append(imagedata)
             
             #print confidence onto the final images
-            img = cv2.imread(outputPath + maxname + '/' + name[0] + '.jpg')
+        img = cv2.imread(outputPath + maxname + '/' + name[0] + '.jpg')
             
-            cv2.putText(img, str(imagedata), (0, len(img) - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 1)
+        cv2.putText(img, str(imagedata), (0, len(img) - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.002 * len(img[0]), (100, 255, 255), 1)
             #saves image
-            write_name = finalPath + '/' + name[0] + '.jpg'
-            cv2.imwrite(write_name, img)
+        write_name = finalPath + '/' + name[0] + '.jpg'
+        cv2.imwrite(write_name, img)
             
-            
+    final = sorted(final)
+    print("Writing info to txt file")
     with open(finalPath + 'final.txt', 'w') as f:
+        f.write("image, camera, confidence, angle\n")
         for data in final:
-            f.write(data[0] + ", " + data[1] + ", " + str(data[2]) + ", " + str(data[3]) + ", " + str(data[4])+'\n')
-#   sort and print the finaldata
+            f.write(data[0] + ", " + data[1] + ", " + str(data[2]) + ", " + str(data[3]) + '\n')
+    #sort and print the finaldata
+    a = []
+    with open(finalPath + 'final.txt', 'r') as f:
+        for line in islice(f, 1, None): #skip the title line
+            a.append(line.strip())
     print("View final output images and data in " + str(finalPath))
     return
     
@@ -105,15 +96,36 @@ def compareFolder(outputPath, dataPath, finalPath):
 if __name__ == "__main__":
     #clear the outputPath and finalPath before running the code
     shutil.rmtree('../Output/')
+    shutil.rmtree('../Final/')
     os.mkdir('../Output/')
-    shutil.rmtree('../Final/Ethan/')
-    os.mkdir('../Final/Ethan/')
+    os.mkdir('../Final/')
     
     #specify directory that input data is located
-    dataPath = "../SampleData/SingleTestIMGs/"
+    dataPath = "../TestData/"
     #specify directory that output will be sent to
     outputPath = "../Output/"
-    finalPath = '../Final/Ethan/'
+    finalPath = '../Final/'
+    #hard coded angles (value) associated with the camera id (key)
+    angleDict = {'00': 0, '01': 150, '02': 225}
+    countDict = {}
 
 #    compareSingle(outputPath, dataPath)
-    compareFolder(outputPath, dataPath, finalPath)
+    #run the script on each person present in the data
+    for person in os.listdir(dataPath):
+        os.mkdir(finalPath + person + '/')
+        os.mkdir(outputPath + person + '/')
+        compareFolder(outputPath + person + '/', dataPath + person + '/', finalPath + person + '/', angleDict)
+    #create final txt file that summarizes data across all people
+    for angle in os.listdir(finalPath):
+        with open(finalPath + angle + '/final.txt', 'r') as f:
+            fdata = f.readlines()[1:]
+        for line in fdata:
+            val = line.split(',')[0]
+            if val not in countDict:
+                countDict[val] = 0
+            #increment the dictionary value at the time if a person is present at that time
+            countDict[val] += 1
+    with open(finalPath + 'final.txt', 'w') as f:
+        f.write("Image, # present\n")
+        for i in sorted(countDict.items()):
+            f.write(i[0] + ', ' + str(i[1]) + '\n')
