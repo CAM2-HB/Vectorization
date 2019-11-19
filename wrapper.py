@@ -59,6 +59,7 @@ def compareFolder(outputPath, dataPath, finalPath, angleDict):
                     confidence = float(data[1][1])
                     if confidence > maxconfidence:
                         maxconfidence = confidence
+                        maxname = folder
                         for index, d in enumerate(data[0]):
                         #search top row of CSV for pose_Ry, which is the angle we are analyzing for starters
                             if d == ' pose_Ry':
@@ -81,9 +82,9 @@ def compareFolder(outputPath, dataPath, finalPath, angleDict):
     final = sorted(final)
     print("Writing info to txt file")
     with open(finalPath + 'final.txt', 'w') as f:
-        f.write("image, camera, confidence, angle\n")
+        f.write("  image   camera   confidence   angle\n")
         for data in final:
-            f.write(data[0] + ", " + data[1] + ", " + str(data[2]) + ", " + str(data[3]) + '\n')
+            f.write(data[0].rjust(6) + "  " + data[1].rjust(6) + "  " + str(data[2]).rjust(10) + "  " + '{:.4f}'.format(round(data[3], 4)).rjust(10) + '\n')
     #sort and print the finaldata
     a = []
     with open(finalPath + 'final.txt', 'r') as f:
@@ -120,12 +121,12 @@ if __name__ == "__main__":
         with open(finalPath + angle + '/final.txt', 'r') as f:
             fdata = f.readlines()[1:]
         for line in fdata:
-            val = line.split(',')[0]
+            val = line.split()[0]
             if val not in countDict:
                 countDict[val] = 0
             #increment the dictionary value at the time if a person is present at that time
             countDict[val] += 1
     with open(finalPath + 'final.txt', 'w') as f:
-        f.write("Image, # present\n")
+        f.write("  image    # present\n")
         for i in sorted(countDict.items()):
-            f.write(i[0] + ', ' + str(i[1]) + '\n')
+            f.write(i[0].rjust(6) + ' ' + str(i[1]).rjust(10) + '\n')
